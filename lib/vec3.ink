@@ -23,11 +23,7 @@ multiply := (v, c) => {
 	y: v.y / c
 	z: v.z / c
 }
-dot := (a, b) => {
-	x: a.x * b.x
-	y: a.y * b.y
-	z: a.z * b.z
-}
+dot := (a, b) => a.x * b.x + a.y * b.y + a.z * b.z
 cross := (a, b) => {
 	x: a.y * b.z - a.z * b.y
 	y: a.z * b.x - a.x * b.z
