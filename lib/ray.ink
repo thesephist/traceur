@@ -11,12 +11,11 @@ create := (pos, dir) => {
 
 eq := (a, b) => veq(a.pos, b.pos) & veq(a.dir, b.dir)
 
-fromPoints := (from, to) => {
-	create(
-		pos: from
-		dir: (vec3.sub)(to, from)
-	)
-}
+fromPoints := (from, to) => create(
+	from
+	(vec3.sub)(to, from)
+)
+
 
 reverse := ray => create(
 	ray.pos
