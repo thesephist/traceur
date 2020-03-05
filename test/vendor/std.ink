@@ -3,17 +3,15 @@
 log := val => out(string(val) + '
 ')
 
-scan := callback => (
+scan := cb => (
 	acc := ['']
-	cb := evt => evt.type :: {
-		'end' -> callback(acc.0)
+	in(evt => evt.type :: {
+		'end' -> cb(acc.0)
 		'data' -> (
-			acc.0 :=
-				acc.0 + slice(evt.data, 0, len(evt.data) - 1)
+			acc.0 := acc.0 + slice(evt.data, 0, len(evt.data) - 1)
 			false
 		)
-	}
-	in(cb)
+	})
 )
 
 ` hexadecimal conversion utility functions `
@@ -21,12 +19,10 @@ hToN := {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 'a': 10, 'b
 nToH := '0123456789abcdef'
 
 ` take number, return hex string `
-hex := n => (
-	(sub := (p, acc) => p < 16 :: {
-		true -> nToH.(p) + acc
-		false -> sub(floor(p / 16), nToH.(p % 16) + acc)
-	})(floor(n), '')
-)
+hex := n => (sub := (p, acc) => p < 16 :: {
+	true -> nToH.(p) + acc
+	false -> sub(floor(p / 16), nToH.(p % 16) + acc)
+})(floor(n), '')
 
 ` take hex string, return number `
 xeh := s => (
@@ -69,7 +65,7 @@ range := (start, end, step) => (
 )
 
 ` clamp start and end numbers to ranges, such that
-	start < end. Utility used in slice/sliceList`
+	start < end. Utility used in slice `
 clamp := (start, end, min, max) => (
 	start := (start < min :: {
 		true -> min
@@ -94,32 +90,20 @@ clamp := (start, end, min, max) => (
 	}
 )
 
-` get a substring of a given string `
-slice := (str, start, end) => (
+` get a substring of a given string, or sublist of a given list `
+slice := (s, start, end) => (
 	` bounds checks `
-	x := clamp(start, end, 0, len(str))
+	x := clamp(start, end, 0, len(s))
 	start := x.start
-	end := x.end
+	max := x.end - start
 
-	max := end - start
 	(sub := (i, acc) => i :: {
 		max -> acc
-		_ -> sub(i + 1, acc + str.(start + i))
-	})(0, '')
-)
-
-` get a sub-list of a given list `
-sliceList := (list, start, end) => (
-	` bounds checks `
-	x := clamp(start, end, 0, len(list))
-	start := x.start
-	end := x.end
-
-	max := end - start
-	(sub := (i, acc) => i :: {
-		max -> acc
-		_ -> sub(i + 1, acc.(i) := list.(start + i))
-	})(0, [])
+		_ -> sub(i + 1, acc.(i) := s.(start + i))
+	})(0, type(s) :: {
+		'string' -> ''
+		'composite' -> []
+	})
 )
 
 ` join one list to the end of another, return the original first list `
@@ -193,19 +177,7 @@ reduceBack := (list, f, acc) => (
 )
 
 ` flatten by depth 1 `
-flatten := list => (
-	max := len(list)
-	(sub := (i, count, acc) => i :: {
-		max -> acc
-		_ -> (
-			cur := list.(i)
-			each(cur, (item, idx) => (
-				acc.(count + idx) := item
-			))
-			sub(i + 1, count + len(cur), acc)
-		)
-	})(0, 0, [])
-)
+flatten := list => reduce(list, join, [])
 
 ` true iff some items in list are true `
 some := list => reduce(list, (acc, x) => acc | x, false)
@@ -249,7 +221,7 @@ encode := str => (
 decode := data => reduce(data, (acc, cp) => acc + char(cp), '')
 
 ` utility for reading an entire file `
-readFile := (path, callback) => (
+readFile := (path, cb) => (
 	BUFSIZE := 4096 ` bytes `
 	sent := [false]
 	(accumulate := (offset, acc) => read(path, offset, BUFSIZE, evt => (
@@ -257,7 +229,7 @@ readFile := (path, callback) => (
 			evt.type :: {
 				'error' -> (
 					sent.0 := true
-					callback(())
+					cb(())
 				)
 				'data' -> (
 					dataLen := len(evt.data)
@@ -265,7 +237,7 @@ readFile := (path, callback) => (
 						true -> accumulate(offset + dataLen, acc + evt.data)
 						false -> (
 							sent.0 := true
-							callback(acc + evt.data)
+							cb(acc + evt.data)
 						)
 					}
 				)
@@ -277,7 +249,7 @@ readFile := (path, callback) => (
 ` utility for writing an entire file
 	it's not buffered, because it's simpler, but may cause jank later
 	we'll address that if/when it becomes a performance issue `
-writeFile := (path, data, callback) => (
+writeFile := (path, data, cb) => (
 	sent := [false]
 	` write() by itself will not truncate files that are too long,
 		so we delete the file and re-write. Not efficient, but writeFile
@@ -287,12 +259,12 @@ writeFile := (path, data, callback) => (
 			sent.0 :: {false -> (
 				sent.0 := true
 				evt.type :: {
-					'error' -> callback(())
-					'end' -> callback(true)
+					'error' -> cb(())
+					'end' -> cb(true)
 				}
 			)}
 		))
-		_ -> callback(())
+		_ -> cb(())
 	})
 )
 
