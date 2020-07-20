@@ -4,6 +4,10 @@ std := load('../vendor/std')
 
 f := std.format
 
+util := load('util')
+
+randRange := util.randRange
+
 create := (x, y, z) => {x: x, y: y, z: z}
 
 Zero := create(0, 0, 0)
@@ -48,3 +52,24 @@ cross := (a, b) => {
 list := v => [v.x, v.y, v.z]
 
 string := v => f('[{{x}}, {{y}}, {{z}}]', v)
+
+rand := () => create(rand(), rand(), rand())
+
+randRange := (min, max) => create(
+	(util.randRange)(min, max)
+	(util.randRange)(min, max)
+	(util.randRange)(min, max)
+)
+
+` if after a 1000 attempts, we don't find
+	an internal point, return [0, 0, 0] `
+randUnitSphere := () => (sub := i => i :: {
+	0 -> Zero
+	_ -> (
+		p := randRange(~1, 1)
+		abssq(p) < 1 :: {
+			true -> p
+			false -> sub(i - 1)
+		}
+	)
+})(10)

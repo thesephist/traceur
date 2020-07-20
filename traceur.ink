@@ -23,8 +23,9 @@ Width := 160
 Height := 90
 Aspect := Width / Height
 
-SamplesPerPixel := 10
+SamplesPerPixel := 20
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
+MaxDepth := 50
 
 ViewportHeight := 2
 ViewportWidth := ViewportHeight * Aspect
@@ -68,37 +69,42 @@ Shapes := (shape.collection)([
 ])
 
 ` note that in ink/bmp, rgb is reversed `
-color := r => (
-	rec := (shape.hitRecord)(
-		vec3.Zero
-		vec3.Zero
-		0
-		false
-	)
-
-	(Shapes.hit)(r, 0, 9999999, rec) :: {
-		true -> (
-			[
-				127 * (rec.normal.z + 1)
-				127 * (rec.normal.y + 1)
-				127 * (rec.normal.x + 1)
-			]
+color := (r, depth) => depth :: {
+	0 -> [0, 0, 0]
+	_ -> (
+		rec := (shape.hitRecord)(
+			vec3.Zero
+			vec3.Zero
+			0
+			false
 		)
-		false -> (
-			unitDir := (vec3.norm)(r.dir)
-			t := 0.5 * (unitDir.y + 1)
-			(vec3.list)(
-				(vec3.multiply)(
+
+		(Shapes.hit)(r, 0.0001, 9999999, rec) :: {
+			true -> (
+				target := (vec3.add)(
+					(vec3.add)(rec.point, rec.normal)
+					(vec3.randUnitSphere)()
+				)
+				c := color((ray.create)(rec.point, (vec3.sub)(target, rec.point)), depth - 1)
+				[
+					c.0 * 0.5
+					c.1 * 0.5
+					c.2 * 0.5
+				]
+			)
+			false -> (
+				unitDir := (vec3.norm)(r.dir)
+				t := 0.5 * (unitDir.y + 1)
+				(vec3.list)(
 					(vec3.add)(
 						(vec3.multiply)((vec3.create)(1, 1, 1), 1 - t)
 						(vec3.create)(t, 0.7 * t, 0.5 * t)
 					)
-					255
 				)
 			)
-		)
-	}
-)
+		}
+	)
+}
 
 progress := {
 	time: time()
@@ -123,16 +129,16 @@ data := map(range(0, Width * Height, 1), i => (
 		v := (y + rand()) / (Height - 1)
 		r := (Camera.getRay)(u, v)
 
-		c := color(r)
+		c := color(r, MaxDepth)
 		acc.0 := acc.0 + c.0
 		acc.1 := acc.1 + c.1
 		acc.2 := acc.2 + c.2
 	), [0, 0, 0])
 
 	[
-		sum.0 / SamplesPerPixel
-		sum.1 / SamplesPerPixel
-		sum.2 / SamplesPerPixel
+		pow(sum.0 / SamplesPerPixel, 0.5) * 255
+		pow(sum.1 / SamplesPerPixel, 0.5) * 255
+		pow(sum.2 / SamplesPerPixel, 0.5) * 255
 	]
 ))
 
