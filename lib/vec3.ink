@@ -6,6 +6,8 @@ f := std.format
 
 create := (x, y, z) => {x: x, y: y, z: z}
 
+Zero := create(0, 0, 0)
+
 ` square of length of a vec3 is often useful for comparisons,
 	and faster when we don't actually need an abs() `
 abssq := v => (v.x * v.x) + (v.y * v.y) + (v.z * v.z)

@@ -1,23 +1,100 @@
 ` library of basic shapes `
 
-vec3 := load('vec3')
+std := load('../vendor/std')
 
-` shapes are designed to be "objects"
+each := std.each
+
+vec3 := load('vec3')
+ray := load('ray')
+
+` hit record `
+hitRecord := (point, normal, t, frontFace) => self := {
+	point: point
+	normal: normal
+	t: t
+	frontFace: frontFace
+	setFaceNormal: (r, outwardNormal) => (
+		self.frontFace := (vec3.dot)(r.dir, outwardNormal) < 0
+		self.normal := (self.frontFace :: {
+			true -> outwardNormal
+			false -> (vec3.neg)(outwardNormal)
+		})
+	)
+}
+
+` hittable shapes
+
+	shapes are designed to be "objects"
 	with methods as closures that export objects
 	with function references `
 
 sphere := (pos, radius) => {
 	pos: pos
 	radius: radius
-	hit: ray => (
-		oc := (vec3.sub)(ray.pos, pos)
-		a := (vec3.abssq)(ray.dir)
-		halfB := (vec3.dot)(oc, ray.dir)
+	hit: (r, tMin, tMax, rec) => (
+		oc := (vec3.sub)(r.pos, pos)
+		a := (vec3.abssq)(r.dir)
+		halfB := (vec3.dot)(oc, r.dir)
 		c := (vec3.abssq)(oc) - radius * radius
 		discriminant := halfB * halfB - a * c
 		discriminant < 0 :: {
-			true -> ~1
-			false -> (~halfB - pow(discriminant, 0.5)) / a
+			true -> false
+			false -> (
+				root := pow(discriminant, 0.5)
+				t1 := (~halfB + root) / a
+				t2 := (~halfB - root) / a
+
+				inRange := t => t < tMax & t > tMin
+				[inRange(t1), inRange(t2)] :: {
+					[_, true] -> (
+						rec.t := t2
+						rec.point := (ray.at)(r, t2)
+						outwardNormal := (vec3.divide)((vec3.sub)(rec.point, pos), radius)
+						(rec.setFaceNormal)(r, outwardNormal)
+						true
+					)
+					[true, _] -> (
+						rec.t := t1
+						rec.point := (ray.at)(r, t1)
+						outwardNormal := (vec3.divide)((vec3.sub)(rec.point, pos), radius)
+						(rec.setFaceNormal)(r, outwardNormal)
+						true
+					)
+					_ -> false
+				}
+			)
 		}
+	)
+}
+
+collection := items => {
+	items: items
+	hit: (r, tMin, tMax, rec) => (
+		tmp := {
+			rec: (hitRecord)(
+				vec3.Zero
+				vec3.Zero
+				0
+				false
+			)
+			hitAnything: false
+			closestSoFar: tMax
+		}
+
+		each(items, item => (
+			(item.hit)(r, tMin, tmp.closestSoFar, tmp.rec) :: {
+				true -> (
+					tmp.hitAnything := true
+					tmp.closestSoFar := tmp.rec.t
+
+					rec.point := tmp.rec.point
+					rec.normal := tmp.rec.normal
+					rec.t := tmp.rec.t
+					rec.frontFace := tmp.rec.frontFace
+				)
+			}
+		))
+
+		tmp.hitAnything
 	)
 }

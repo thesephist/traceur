@@ -44,23 +44,33 @@ LowerLeft := (vec3.sub)(
 	- focal length: 1 unit
 	- right-handed coordinates, camera looking -z direction `
 
-` scene descriptions `
 
-Sphere := (shape.sphere)(
-	(vec3.create)(0, 0, ~1)
-	0.5
-)
+Shapes := (shape.collection)([
+	(shape.sphere)(
+		(vec3.create)(0, 0, ~1)
+		0.5
+	)
+	(shape.sphere)(
+		(vec3.create)(0, ~100.5, ~1)
+		100
+	)
+])
 
 ` note that in ink/bmp, rgb is reversed `
 color := r => (
-	t := (Sphere.hit)(r)
-	t > 0 :: {
+	rec := (shape.hitRecord)(
+		vec3.Zero
+		vec3.Zero
+		0
+		false
+	)
+
+	(Shapes.hit)(r, 0, 9999999, rec) :: {
 		true -> (
-			normal := (vec3.norm)((vec3.sub)((ray.at)(r, t), Sphere.pos))
 			[
-				127 * (normal.z + 1)
-				127 * (normal.y + 1)
-				127 * (normal.x + 1)
+				127 * (rec.normal.z + 1)
+				127 * (rec.normal.y + 1)
+				127 * (rec.normal.x + 1)
 			]
 		)
 		false -> (
