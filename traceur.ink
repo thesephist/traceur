@@ -23,7 +23,7 @@ Width := 160
 Height := 90
 Aspect := Width / Height
 
-SamplesPerPixel := 20
+SamplesPerPixel := 8
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
 
@@ -83,7 +83,7 @@ color := (r, depth) => depth :: {
 			true -> (
 				target := (vec3.add)(
 					(vec3.add)(rec.point, rec.normal)
-					(vec3.randUnitSphere)()
+					(vec3.randUnitVec)()
 				)
 				c := color((ray.create)(rec.point, (vec3.sub)(target, rec.point)), depth - 1)
 				[

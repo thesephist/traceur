@@ -72,4 +72,11 @@ randUnitSphere := () => (sub := i => i :: {
 			false -> sub(i - 1)
 		}
 	)
-})(10)
+})(1000)
+
+randUnitVec := () => (
+	a := (util.randRange)(0, 2 * util.Pi)
+	z := (util.randRange)(~1, 1)
+	r := pow(1 - z * z, 0.5)
+	create(r * cos(a), r * sin(a), z)
+)
