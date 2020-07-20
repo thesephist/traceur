@@ -82,3 +82,16 @@ randUnitVec := () => (
 )
 
 reflect := (v, n) => sub(v, multiply(n, 2 * dot(v, n)))
+
+` nabs is x -> |x|, since abs() exists for vec3 `
+nabs := n => n > 0 :: {
+	true -> n
+	false -> ~n
+}
+
+refract := (uv, n, eta) => (
+	cosTheta := dot(neg(uv), n)
+	rOutPerp := multiply(add(uv, multiply(n, cosTheta)), eta)
+	rOutParallel := multiply(n, ~pow(nabs(1 - abssq(rOutPerp)), 0.5))
+	add(rOutPerp, rOutParallel)
+)

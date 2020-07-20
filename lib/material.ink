@@ -56,4 +56,30 @@ Metal := (color, fuzz) => {
 ` perfectly reflective Metal `
 Mirror := color => Metal(color, 0)
 
+` ri: refractive index `
+Dielectric := ri => {
+	ri: ri
+	scatter: (r, rec, attenuation, scattered) => (
+		attenuation := [1, 1, 1]
+		eta := (rec.frontFace :: {
+			true -> 1 / ri
+			false -> ri
+		})
+
+		unitDir := (vec3.norm)(r.dir)
+		refracted := (vec3.refract)(unitDir, rec.normal, eta)
+
+		scattered.pos := rec.point
+		scattered.dir := refracted
+
+		true
+	)
+}
+
+Glass := Dielectric(1.517)
+
+Water := Dielectric(1.333)
+
+Diamond := Dielectric(2.417)
+
 Zero := Lambertian([0, 0, 0], 0.5)
