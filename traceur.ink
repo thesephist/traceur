@@ -9,17 +9,22 @@ log := std.log
 f := std.format
 range := std.range
 map := std.map
+reduce := std.reduce
 writeFile := std.writeFile
 
 vec3 := load('lib/vec3')
 ray := load('lib/ray')
 shape := load('lib/shape')
+camera := load('lib/camera')
 
 OutputPath := './out.bmp'
 
 Width := 160
 Height := 90
 Aspect := Width / Height
+
+SamplesPerPixel := 10
+SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 
 ViewportHeight := 2
 ViewportWidth := ViewportHeight * Aspect
@@ -44,6 +49,12 @@ LowerLeft := (vec3.sub)(
 	- focal length: 1 unit
 	- right-handed coordinates, camera looking -z direction `
 
+Camera := (camera.create)(
+	Origin
+	LowerLeft
+	Horizontal
+	Vertical
+)
 
 Shapes := (shape.collection)([
 	(shape.sphere)(
@@ -107,23 +118,22 @@ data := map(range(0, Width * Height, 1), i => (
 		)
 	}
 
-	u := x / (Width - 1)
-	v := y / (Height - 1)
-	uu := (vec3.multiply)(Horizontal, u)
-	vv := (vec3.multiply)(Vertical, v)
+	sum := reduce(SamplesPerPixelRange, acc => (
+		u := (x + rand()) / (Width - 1)
+		v := (y + rand()) / (Height - 1)
+		r := (Camera.getRay)(u, v)
 
-	r := (ray.create)(
-		Origin
-		(vec3.sub)(
-			(vec3.add)(
-				LowerLeft
-				(vec3.add)(uu, vv)
-			)
-			Origin
-		)
-	)
+		c := color(r)
+		acc.0 := acc.0 + c.0
+		acc.1 := acc.1 + c.1
+		acc.2 := acc.2 + c.2
+	), [0, 0, 0])
 
-	color(r)
+	[
+		sum.0 / SamplesPerPixel
+		sum.1 / SamplesPerPixel
+		sum.2 / SamplesPerPixel
+	]
 ))
 
 file := bmp(Width, Height, data)
