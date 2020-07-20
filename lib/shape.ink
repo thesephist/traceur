@@ -15,6 +15,9 @@ sphere := (pos, radius) => {
 		b := 2 * (vec3.dot)(oc, ray.dir)
 		c := (vec3.dot)(oc, oc) - radius * radius
 		discriminant := b * b - 4 * a * c
-		discriminant > 0
+		discriminant < 0 :: {
+			true -> ~1
+			false -> (~b - pow(discriminant, 0.5)) / (2 * a)
+		}
 	)
 }

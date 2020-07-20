@@ -11,7 +11,7 @@ create := (pos, dir) => {
 
 eq := (a, b) => veq(a.pos, b.pos) & veq(a.dir, b.dir)
 
-at := (ray, t) => (vec3.add)(ray.pos, (vec.multiply)(ray.dir, t))
+at := (ray, t) => (vec3.add)(ray.pos, (vec3.multiply)(ray.dir, t))
 
 fromPoints := (from, to) => create(
 	from

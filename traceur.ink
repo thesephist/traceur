@@ -52,11 +52,19 @@ Sphere := (shape.sphere)(
 )
 
 ` note that in ink/bmp, rgb is reversed `
-color := ray => (
-	(Sphere.hit)(ray) :: {
-		true -> [0, 0, 255]
+color := r => (
+	t := (Sphere.hit)(r)
+	t > 0 :: {
+		true -> (
+			normal := (vec3.norm)((vec3.sub)((ray.at)(r, t), Sphere.pos))
+			[
+				127 * (normal.z + 1)
+				127 * (normal.y + 1)
+				127 * (normal.x + 1)
+			]
+		)
 		false -> (
-			unitDir := (vec3.norm)(ray.dir)
+			unitDir := (vec3.norm)(r.dir)
 			t := 0.5 * (unitDir.y + 1)
 			(vec3.list)(
 				(vec3.multiply)(
