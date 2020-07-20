@@ -1,5 +1,9 @@
 ` vec3 math library `
 
+std := load('../vendor/std')
+
+f := std.format
+
 create := (x, y, z) => {x: x, y: y, z: z}
 
 ` square of length of a vec3 is often useful for comparisons,
@@ -12,20 +16,33 @@ neg := v => {x: ~x, y: ~y, z: ~z}
 norm := v => multiply(v, 1 / abs(v))
 
 eq := (a, b) => (a.x = b.x) & (a.y = b.y) & (a.z = b.z)
+
 add := (a, b) => {
 	x: a.x + b.x
 	y: a.y + b.y
 	z: a.z + b.z
 }
+
 sub := (a, b) => add(a, neg(b))
+
 multiply := (v, c) => {
-	x: v.x / c
-	y: v.y / c
-	z: v.z / c
+	x: v.x * c
+	y: v.y * c
+	z: v.z * c
 }
+
+neg := v => multiply(v, ~1)
+
+divide := (v, c) => multiply(v, 1 / c)
+
 dot := (a, b) => a.x * b.x + a.y * b.y + a.z * b.z
+
 cross := (a, b) => {
 	x: a.y * b.z - a.z * b.y
 	y: a.z * b.x - a.x * b.z
 	z: a.x * b.y - a.y * b.x
 }
+
+list := v => [v.x, v.y, v.z]
+
+string := v => f('[{{x}}, {{y}}, {{z}}]', v)

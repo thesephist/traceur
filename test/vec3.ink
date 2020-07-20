@@ -1,7 +1,12 @@
 ` tests for vec3 `
 
+std := load('../vendor/std')
+
+log := std.log
+f := std.format
+
 ` ink standard test runner `
-s := (load('vendor/suite').suite)('traceur/vec3')
+s := (load('../vendor/suite').suite)('traceur/vec3')
 
 ` helper functions for the test suite `
 mark := s.mark
@@ -27,7 +32,32 @@ mark('abs & abssq')
 	test('abssq() returns correct squared length', (vec3.abssq)(v), 25)
 )
 
-` TODO: flesh this out `
+mark('vec3 arithmetic')
+(
+	a := (vec3.create)(1, 2, 3)
+	b := (vec3.create)(4, 5, 6)
+
+	test('vec3.add'
+		veq((vec3.add)(a, b), (vec3.create)(5, 7, 9)), true)
+	test('vec3.sub'
+		veq((vec3.sub)(b, a), (vec3.create)(3, 3, 3)), true)
+	test('vec3.neg'
+		veq((vec3.neg)(a), (vec3.create)(~1, ~2, ~3)), true)
+	test('vec3.multiply'
+		veq((vec3.multiply)(a, 3), (vec3.create)(3, 6, 9)), true)
+	test('vec3.divide'
+		veq((vec3.divide)(b, 2), (vec3.create)(2, 2.5, 3)), true)
+)
+
+mark('vec3.dot/cross')
+(
+	a := (vec3.create)(1, 2, 3)
+	b := (vec3.create)(4, 5, 6)
+
+	test('vec3.dot', (vec3.dot)(a, b), 32)
+	test('vec3.cross'
+		veq((vec3.cross)(a, b), (vec3.create)(~3, 6, ~3)), true)
+)
 
 ` print out test suite results `
 (s.end)()
