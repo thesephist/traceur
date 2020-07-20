@@ -80,3 +80,5 @@ randUnitVec := () => (
 	r := pow(1 - z * z, 0.5)
 	create(r * cos(a), r * sin(a), z)
 )
+
+reflect := (v, n) => sub(v, multiply(n, 2 * dot(v, n)))

@@ -16,6 +16,7 @@ vec3 := load('lib/vec3')
 ray := load('lib/ray')
 shape := load('lib/shape')
 camera := load('lib/camera')
+material := load('lib/material')
 
 OutputPath := './out.bmp'
 
@@ -61,10 +62,12 @@ Shapes := (shape.collection)([
 	(shape.sphere)(
 		(vec3.create)(0, 0, ~1)
 		0.5
+		(material.Lambertian)([0.5, 0.5, 0.5])
 	)
 	(shape.sphere)(
 		(vec3.create)(0, ~100.5, ~1)
 		100
+		(material.Lambertian)([0.5, 0.5, 0.5])
 	)
 ])
 
@@ -72,24 +75,23 @@ Shapes := (shape.collection)([
 color := (r, depth) => depth :: {
 	0 -> [0, 0, 0]
 	_ -> (
-		rec := (shape.hitRecord)(
-			vec3.Zero
-			vec3.Zero
-			0
-			false
-		)
+		rec := shape.hitRecordZero
 
 		(Shapes.hit)(r, 0.0001, 9999999, rec) :: {
 			true -> (
-				c := color((ray.create)(
-					rec.point
-					(vec3.add)(rec.normal, (vec3.randUnitVec)())
-				), depth - 1)
-				[
-					c.0 * 0.5
-					c.1 * 0.5
-					c.2 * 0.5
-				]
+				attenuation := [1, 1, 1]
+				scattered := ray.Zero
+				(rec.material.scatter)(r, rec, attenuation, scattered) :: {
+					true -> (
+						c := color(scattered, depth - 1)
+						[
+							attenuation.0 * c.0
+							attenuation.1 * c.1
+							attenuation.2 * c.2
+						]
+					)
+					false -> [0, 0, 0]
+				}
 			)
 			false -> (
 				unitDir := (vec3.norm)(r.dir)
