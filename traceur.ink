@@ -22,48 +22,21 @@ OutputPath := './out.bmp'
 
 Width := 160
 Height := 90
-Aspect := Width / Height
+aspect := Width / Height
 
 SamplesPerPixel := 8
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
 
-ViewportHeight := 2
-ViewportWidth := ViewportHeight * Aspect
-FocalLength := 1
+` scene setup `
 
-Origin := (vec3.create)(0, 0, 0)
-Horizontal := (vec3.create)(ViewportWidth, 0, 0)
-Vertical := (vec3.create)(0, ViewportHeight, 0)
-Focus := (vec3.create)(0, 0, FocalLength)
-LowerLeft := (vec3.sub)(
-	Origin
-	(vec3.add)(
-		(vec3.add)(
-			(vec3.divide)(Horizontal, 2), (vec3.divide)(Vertical, 2)
-		)
-		Focus
-	)
-)
-
-` scene setup:
-	- viewport 2 units tall
-	- focal length: 1 unit
-	- right-handed coordinates, camera looking -z direction `
-
-Camera := (camera.create)(
-	Origin
-	LowerLeft
-	Horizontal
-	Vertical
-)
+Camera := (camera.create)(90, aspect)
 
 Shapes := (shape.collection)([
 	(shape.sphere)(
 		(vec3.create)(0, 0, ~1)
 		0.5
-		(material.Glass)
-		(material.Lambertian)([0.5, 0.5, 0.5])
+		(material.Lambertian)([0.6, 0.5, 0.3])
 	)
 	(shape.sphere)(
 		(vec3.create)(0, ~100.5, ~1)
@@ -73,7 +46,12 @@ Shapes := (shape.collection)([
 	(shape.sphere)(
 		(vec3.create)(~1, 0, ~1)
 		0.5
-		(material.Mirror)([0.8, 0.8, 0.8])
+		material.Glass
+	)
+	(shape.sphere)(
+		(vec3.create)(~1, 0, ~1)
+		~0.4
+		material.Glass
 	)
 	(shape.sphere)(
 		(vec3.create)(1, 0, ~1)
