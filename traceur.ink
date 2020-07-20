@@ -18,12 +18,19 @@ shape := load('lib/shape')
 camera := load('lib/camera')
 material := load('lib/material')
 
+v := vec3.create
+vnorm := vec3.norm
+vadd := vec3.add
+vmul := vec3.multiply
+vlist := vec3.list
+sphere := shape.sphere
+
 OutputPath := './out.bmp'
 
-Width := 320
-Height := 180
+Width := 160
+Height := 90
 
-SamplesPerPixel := 40
+SamplesPerPixel := 8
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
 
@@ -33,35 +40,35 @@ Camera := (camera.create)(
 	v(~2, 2, 1)
 	v(0, 0, ~1)
 	v(0, 1, 0)
-	20
+	30
 	Width / Height
 )
 
 Shapes := (shape.collection)([
-	(shape.sphere)(
+	sphere(
 		v(0, 0, ~1)
 		0.5
 		(material.Lambertian)([0.6, 0.5, 0.3])
 	)
-	(shape.sphere)(
-		(vec3.create)(0, ~100.5, ~1)
+	sphere(
+		v(0, ~100.5, ~1)
 		100
 		(material.Lambertian)([0.5, 0.5, 0.5])
 	)
-	(shape.sphere)(
-		(vec3.create)(~1, 0, ~1)
+	sphere(
+		v(~1, 0, ~1)
 		0.5
 		material.Glass
 	)
-	(shape.sphere)(
-		(vec3.create)(~1, 0, ~1)
+	sphere(
+		v(~1, 0, ~1)
 		~0.4
 		material.Glass
 	)
-	(shape.sphere)(
-		(vec3.create)(1, 0, ~1)
+	sphere(
+		v(1, 0, ~1)
 		0.5
-		(material.Metal)([0.2, 0.6, 0.8], 1)
+		(material.Metal)([0.2, 0.6, 0.8], 0.12)
 	)
 ])
 
@@ -88,12 +95,12 @@ color := (r, depth) => depth :: {
 				}
 			)
 			false -> (
-				unitDir := (vec3.norm)(r.dir)
+				unitDir := vnorm(r.dir)
 				t := 0.5 * (unitDir.y + 1)
-				(vec3.list)(
-					(vec3.add)(
-						(vec3.multiply)((vec3.create)(1, 1, 1), 1 - t)
-						(vec3.create)(t, 0.7 * t, 0.5 * t)
+				vlist(
+					vadd(
+						vmul(v(1, 1, 1), 1 - t)
+						v(t, 0.7 * t, 0.5 * t)
 					)
 				)
 			)

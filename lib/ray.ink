@@ -2,7 +2,10 @@
 
 vec3 := load('vec3')
 
-veq := vec3.eq
+vneg := vec3.neg
+vadd := vec3.add
+vsub := vec3.sub
+vmul := vec3.multiply
 
 create := (pos, dir) => {
 	pos: pos
@@ -11,16 +14,14 @@ create := (pos, dir) => {
 
 Zero := create(vec3.Zero, vec3.Zero)
 
-eq := (a, b) => veq(a.pos, b.pos) & veq(a.dir, b.dir)
-
-at := (ray, t) => (vec3.add)(ray.pos, (vec3.multiply)(ray.dir, t))
+at := (ray, t) => vadd(ray.pos, vmul(ray.dir, t))
 
 fromPoints := (from, to) => create(
 	from
-	(vec3.sub)(to, from)
+	vsub(to, from)
 )
 
 reverse := ray => create(
 	ray.pos
-	(vec3.neg)(ray.dir)
+	vneg(ray.dir)
 )

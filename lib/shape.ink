@@ -8,6 +8,12 @@ vec3 := load('vec3')
 ray := load('ray')
 material := load('material')
 
+vneg := vec3.neg
+vsub := vec3.sub
+vdiv := vec3.divide
+vabssq := vec3.abssq
+vdot := vec3.dot
+
 ` hit record `
 hitRecord := (point, normal, material, t, frontFace) => self := {
 	point: point
@@ -16,10 +22,10 @@ hitRecord := (point, normal, material, t, frontFace) => self := {
 	t: t
 	frontFace: frontFace
 	setFaceNormal: (r, outwardNormal) => (
-		self.frontFace := (vec3.dot)(r.dir, outwardNormal) < 0
+		self.frontFace := vdot(r.dir, outwardNormal) < 0
 		self.normal := (self.frontFace :: {
 			true -> outwardNormal
-			false -> (vec3.neg)(outwardNormal)
+			false -> vneg(outwardNormal)
 		})
 	)
 }
@@ -43,10 +49,10 @@ sphere := (pos, radius, material) => {
 	radius: radius
 	material: material
 	hit: (r, tMin, tMax, rec) => (
-		oc := (vec3.sub)(r.pos, pos)
-		a := (vec3.abssq)(r.dir)
-		halfB := (vec3.dot)(oc, r.dir)
-		c := (vec3.abssq)(oc) - radius * radius
+		oc := vsub(r.pos, pos)
+		a := vabssq(r.dir)
+		halfB := vdot(oc, r.dir)
+		c := vabssq(oc) - radius * radius
 		discriminant := halfB * halfB - a * c
 		discriminant < 0 :: {
 			true -> false
@@ -60,7 +66,7 @@ sphere := (pos, radius, material) => {
 					[_, true] -> (
 						rec.t := t2
 						rec.point := (ray.at)(r, t2)
-						outwardNormal := (vec3.divide)((vec3.sub)(rec.point, pos), radius)
+						outwardNormal := vdiv(vsub(rec.point, pos), radius)
 						(rec.setFaceNormal)(r, outwardNormal)
 						rec.material := material
 						true
@@ -68,7 +74,7 @@ sphere := (pos, radius, material) => {
 					[true, _] -> (
 						rec.t := t1
 						rec.point := (ray.at)(r, t1)
-						outwardNormal := (vec3.divide)((vec3.sub)(rec.point, pos), radius)
+						outwardNormal := vdiv(vsub(rec.point, pos), radius)
 						(rec.setFaceNormal)(r, outwardNormal)
 						rec.material := material
 						true

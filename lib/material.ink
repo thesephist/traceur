@@ -3,10 +3,20 @@
 vec3 := load('vec3')
 ray := load('ray')
 
+vnorm := vec3.norm
+vneg := vec3.neg
+vadd := vec3.add
+vmul := vec3.multiply
+vdot := vec3.dot
+vrefl := vec3.reflect
+vrefr := vec3.refract
+vrUS := vec3.randUnitSphere
+vrUV := vec3.randUnitVec
+
 Matte := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
-		scatterDir := (vec3.add)(rec.normal, (vec3.randUnitSphere)())
+		scatterDir := vadd(rec.normal, vrUS())
 
 		scattered.pos := rec.point
 		scattered.dir := scatterDir
@@ -21,7 +31,7 @@ Matte := (color) => {
 Lambertian := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
-		scatterDir := (vec3.add)(rec.normal, (vec3.randUnitVec)())
+		scatterDir := vadd(rec.normal, vrUV())
 
 		scattered.pos := rec.point
 		scattered.dir := scatterDir
@@ -37,19 +47,19 @@ Metal := (color, fuzz) => {
 	color: color
 	fuzz: fuzz
 	scatter: (r, rec, attenuation, scattered) => (
-		reflected := (vec3.reflect)((vec3.norm)(r.dir), rec.normal)
+		reflected := vrefl(vnorm(r.dir), rec.normal)
 
 		scattered.pos := rec.point
 		scattered.dir := (fuzz :: {
 			0 -> reflected
-			_ -> (vec3.add)(reflected, (vec3.multiply)((vec3.randUnitVec)(), fuzz))
+			_ -> vadd(reflected, vmul(vrUV(), fuzz))
 		})
 
 		attenuation.0 := color.0
 		attenuation.1 := color.1
 		attenuation.2 := color.2
 
-		(vec3.dot)(scattered.dir, rec.normal) > 0
+		vdot(scattered.dir, rec.normal) > 0
 	)
 }
 
@@ -72,8 +82,8 @@ Dielectric := ri => {
 			false -> ri
 		})
 
-		unitDir := (vec3.norm)(r.dir)
-		cosThetaTmp := (vec3.dot)((vec3.neg)(unitDir), rec.normal)
+		unitDir := vnorm(r.dir)
+		cosThetaTmp := vdot(vneg(unitDir), rec.normal)
 		cosTheta := (cosThetaTmp > 1 :: {
 			true -> 1
 			false -> cosThetaTmp
@@ -81,7 +91,7 @@ Dielectric := ri => {
 		sinTheta := pow(1 - cosTheta * cosTheta, 0.5)
 		eta * sinTheta > 1 :: {
 			true -> (
-				reflected := (vec3.reflect)(unitDir, rec.normal)
+				reflected := vrefl(unitDir, rec.normal)
 
 				scattered.pos := rec.point
 				scattered.dir := reflected
@@ -90,7 +100,7 @@ Dielectric := ri => {
 			)
 			false -> schlick(cosTheta, eta) > rand() :: {
 				true -> (
-					reflected := (vec3.reflect)(unitDir, rec.normal)
+					reflected := vrefl(unitDir, rec.normal)
 
 					scattered.pos := rec.point
 					scattered.dir := reflected
@@ -98,7 +108,7 @@ Dielectric := ri => {
 					true
 				)
 				false -> (
-					refracted := (vec3.refract)(unitDir, rec.normal, eta)
+					refracted := vrefr(unitDir, rec.normal, eta)
 
 					scattered.pos := rec.point
 					scattered.dir := refracted
