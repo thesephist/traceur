@@ -81,11 +81,10 @@ color := (r, depth) => depth :: {
 
 		(Shapes.hit)(r, 0.0001, 9999999, rec) :: {
 			true -> (
-				target := (vec3.add)(
-					(vec3.add)(rec.point, rec.normal)
-					(vec3.randUnitVec)()
-				)
-				c := color((ray.create)(rec.point, (vec3.sub)(target, rec.point)), depth - 1)
+				c := color((ray.create)(
+					rec.point
+					(vec3.add)(rec.normal, (vec3.randUnitVec)())
+				), depth - 1)
 				[
 					c.0 * 0.5
 					c.1 * 0.5
