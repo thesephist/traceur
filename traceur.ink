@@ -1,43 +1,35 @@
-` main traceur program `
+#!/usr/bin/env ink
 
-` vendored dependencies `
+` traceur: a basic path tracer `
+
 std := load('vendor/std')
+bmp := load('vendor/bmp').bmp
 
 log := std.log
 f := std.format
 range := std.range
-each := std.each
+map := std.map
+writeFile := std.writeFile
 
-` traceur dependencies / libraries `
-vec3 := load('lib/vec3')
-ray := load('lib/ray')
-shape := load('lib/shape')
-trace := load('lib/trace')
+OutputPath := './out.bmp'
 
-Vec3 := vec3.create
-Ray := ray.create
+Width := 120
+Height := 120
 
-` actually render a scene `
+data := map(range(0, Width * Height, 1), i => (
+	x := i % Width
+	y := floor(i / Height)
 
-window := {
-	width: 640
-	height: 480
-}
-
-camera := Ray(
-	Vec3(0, 0, 0)
-	Vec3(0, 0, ~1)
-)
-sph1 := (shape.sphere)(
-	Vec3(0, 0, 30)
-	15
-)
-
-` cast rays from camera `
-` NOTE: loops like this can be more efficient, but
-    not the focus here atm `
-each(range(0, window.width, 1), w => (
-	each(range(0, window.height, 1), h => (
-		` TODO `
-	))
+	[
+		255 * x / (Width - 1)
+		255 * y / (Height - 1)
+		64
+	]
 ))
+
+file := bmp(Width, Height, data)
+
+writeFile(OutputPath, file, r => r :: {
+	() -> log('File write failed')
+	_ -> log('File saved to ' + OutputPath)
+})
