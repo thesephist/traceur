@@ -2,8 +2,11 @@ all: run
 
 # run pathtracer
 run:
-	ink traceur.ink
+	./traceur.ink
 
 # run all tests under test/
 check:
-	ink test/vec3.ink
+	./test.ink
+
+fmt:
+	inkfmt fix lib/*.ink test/*.ink ./*.ink

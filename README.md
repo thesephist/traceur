@@ -19,5 +19,6 @@ Traceur is an experimental pathtracing 3D renderer written in [Ink](https://gith
 
 Make sure you have Ink installed on your system.
 
-- `./test.ink` to run all unit tests
-- `./traceur.ink` to run the pathtracer. The output file defaults to `./out.bmp`
+- `make` (or `make run`) to run the pathtracer. The output file defaults to `./out.bmp`
+- `make check` to run all unit tests
+- `make fmt` to autoformat all files with [inkfmt](https://github.com/thesephist/inkfmt), if you have it installed

@@ -18,13 +18,22 @@ OutputPath := './out.bmp'
 Width := 120
 Height := 120
 
+progress := {
+	time: time()
+}
+
 data := map(range(0, Width * Height, 1), i => (
 	x := i % Width
 	y := floor(i / Height)
 
 	` progress indicator for every row `
 	x :: {
-		0 -> log(f('Rendering row: {{0}}', [y]))
+		0 -> (
+			t := time()
+			elapsed := t - progress.time
+			progress.time := t
+			log(f('Rendering row {{0}} -> {{1}}px/sec', [y, floor(Width / elapsed)]))
+		)
 	}
 
 	[
