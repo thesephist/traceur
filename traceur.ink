@@ -69,6 +69,16 @@ Shapes := (shape.collection)([
 		100
 		(material.Lambertian)([0.5, 0.5, 0.5])
 	)
+	(shape.sphere)(
+		(vec3.create)(~1, 0, ~1)
+		0.5
+		(material.Mirror)([0.8, 0.8, 0.8])
+	)
+	(shape.sphere)(
+		(vec3.create)(1, 0, ~1)
+		0.5
+		(material.Metal)([0.2, 0.6, 0.8], 1)
+	)
 ])
 
 ` note that in ink/bmp, rgb is reversed `

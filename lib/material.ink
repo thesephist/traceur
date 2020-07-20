@@ -33,13 +33,17 @@ Lambertian := (color) => {
 	)
 }
 
-Metal := color => {
+Metal := (color, fuzz) => {
 	color: color
+	fuzz: fuzz
 	scatter: (r, rec, attenuation, scattered) => (
 		reflected := (vec3.reflect)((vec3.norm)(r.dir), rec.normal)
 
 		scattered.pos := rec.point
-		scattered.dir := reflected
+		scattered.dir := (fuzz :: {
+			0 -> reflected
+			_ -> (vec3.add)(reflected, (vec3.multiply)((vec3.randUnitVec)(), fuzz))
+		})
 
 		attenuation.0 := color.0
 		attenuation.1 := color.1
@@ -48,5 +52,8 @@ Metal := color => {
 		(vec3.dot)(scattered.dir, rec.normal) > 0
 	)
 }
+
+` perfectly reflective Metal `
+Mirror := color => Metal(color, 0)
 
 Zero := Lambertian([0, 0, 0], 0.5)
