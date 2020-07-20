@@ -11,13 +11,13 @@ sphere := (pos, radius) => {
 	radius: radius
 	hit: ray => (
 		oc := (vec3.sub)(ray.pos, pos)
-		a := (vec3.dot)(ray.dir, ray.dir)
-		b := 2 * (vec3.dot)(oc, ray.dir)
-		c := (vec3.dot)(oc, oc) - radius * radius
-		discriminant := b * b - 4 * a * c
+		a := (vec3.abssq)(ray.dir)
+		halfB := (vec3.dot)(oc, ray.dir)
+		c := (vec3.abssq)(oc) - radius * radius
+		discriminant := halfB * halfB - a * c
 		discriminant < 0 :: {
 			true -> ~1
-			false -> (~b - pow(discriminant, 0.5)) / (2 * a)
+			false -> (~halfB - pow(discriminant, 0.5)) / a
 		}
 	)
 }
