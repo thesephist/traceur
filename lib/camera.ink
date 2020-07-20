@@ -4,14 +4,20 @@ util := load('util')
 vec3 := load('vec3')
 ray := load('ray')
 
+vabs := vec3.abs
 vnorm := vec3.norm
 vadd := vec3.add
 vsub := vec3.sub
 vmul := vec3.multiply
 vdiv := vec3.divide
 vcross := vec3.cross
+vrUD := vec3.randUnitDisk
 
-create := (lookfrom, lookat, vup, fov, aspect) => (
+rcr := ray.create
+
+create := (lookfrom, lookat, vup, fov, aspect, aperture) => (
+	focusDist := vabs(vsub(lookfrom, lookat))
+
 	theta := (util.degreeToRadian)(fov)
 	h := sin(theta / 2) / cos(theta / 2)
 
@@ -23,34 +29,35 @@ create := (lookfrom, lookat, vup, fov, aspect) => (
 	v := vcross(w, u)
 
 	origin := lookfrom
-	horizontal := vmul(u, viewportWidth)
-	vertical := vmul(v, viewportHeight)
+	horizontal := vmul(u, viewportWidth * focusDist)
+	vertical := vmul(v, viewportHeight * focusDist)
 	lowerLeft := vsub(
 		origin
 		vadd(
 			vadd(
 				vdiv(horizontal, 2), vdiv(vertical, 2)
 			)
-			w
+			vmul(w, focusDist)
 		)
 	)
+	lensRadius := aperture / 2
 
 	{
-		origin: origin
-		lowerLeft: lowerLeft
-		horizontal: horizontal
-		vertical: vertical
-		getRay: (u, v) => (ray.create)(
-			origin
-			vsub(
-				vadd(
-					lowerLeft
+		getRay: (s, t) => (
+			rd := vmul(vrUD(), lensRadius)
+			offset := vadd(vmul(u, rd.x), vmul(v, rd.y))
+			rcr(
+				vadd(origin, offset)
+				vsub(
 					vadd(
-						vmul(horizontal, u)
-						vmul(vertical, v)
+						lowerLeft
+						vadd(
+							vmul(horizontal, s)
+							vmul(vertical, t)
+						)
 					)
+					vadd(origin, offset)
 				)
-				origin
 			)
 		)
 	}

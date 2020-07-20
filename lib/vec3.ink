@@ -6,7 +6,7 @@ f := std.format
 
 util := load('util')
 
-randRange := util.randRange
+urR := util.randRange
 
 create := (x, y, z) => {x: x, y: y, z: z}
 
@@ -56,9 +56,9 @@ string := v => f('[{{x}}, {{y}}, {{z}}]', v)
 rand := () => create(rand(), rand(), rand())
 
 randRange := (min, max) => create(
-	(util.randRange)(min, max)
-	(util.randRange)(min, max)
-	(util.randRange)(min, max)
+	urR(min, max)
+	urR(min, max)
+	urR(min, max)
 )
 
 ` if after a 1000 attempts, we don't find
@@ -74,9 +74,24 @@ randUnitSphere := () => (sub := i => i :: {
 	)
 })(1000)
 
+randUnitDisk := () => (sub := i => i :: {
+	0 -> Zero
+	_ -> (
+		p := create(
+			urR(~1, 1)
+			urR(~1, 1)
+			0
+		)
+		abssq(p) < 1 :: {
+			true -> p
+			false -> sub(i - 1)
+		}
+	)
+})(1000)
+
 randUnitVec := () => (
-	a := (util.randRange)(0, 2 * util.Pi)
-	z := (util.randRange)(~1, 1)
+	a := urR(0, 2 * util.Pi)
+	z := urR(~1, 1)
 	r := pow(1 - z * z, 0.5)
 	create(r * cos(a), r * sin(a), z)
 )

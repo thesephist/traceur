@@ -27,21 +27,22 @@ sphere := shape.sphere
 
 OutputPath := './out.bmp'
 
-Width := 160
-Height := 90
+Width := 320
+Height := 180
 
-SamplesPerPixel := 8
+SamplesPerPixel := 30
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
 
 ` scene setup `
 
 Camera := (camera.create)(
-	v(~2, 2, 1)
+	v(~3, 3, 2)
 	v(0, 0, ~1)
 	v(0, 1, 0)
 	30
 	Width / Height
+	1.2
 )
 
 Shapes := (shape.collection)([
