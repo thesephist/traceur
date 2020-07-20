@@ -10,3 +10,6 @@ check:
 
 fmt:
 	inkfmt fix lib/*.ink test/*.ink ./*.ink
+
+fmt-check:
+	inkfmt lib/*.ink test/*.ink ./*.ink

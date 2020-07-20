@@ -12,19 +12,44 @@ map := std.map
 writeFile := std.writeFile
 
 vec3 := load('lib/vec3')
+ray := load('lib/ray')
 
 OutputPath := './out.bmp'
 
-Width := 120
-Height := 120
+Width := 160
+Height := 90
+Aspect := Width / Height
+
+ViewportHeight := 2
+ViewportWidth := ViewportHeight * Aspect
+FocalLength := 1
+
+Origin := (vec3.create)(0, 0, 0)
+Horizontal := (vec3.create)(ViewportWidth, 0, 0)
+Vertical := (vec3.create)(0, ViewportHeight, 0)
+Focus := (vec3.create)(0, 0, FocalLength)
+LowerLeft := (vec3.sub)(
+	Origin
+	(vec3.add)(
+		(vec3.add)(
+			(vec3.divide)(Horizontal, 2), (vec3.divide)(Vertical, 2)
+		)
+		Focus
+	)
+)
 
 progress := {
 	time: time()
 }
 
+` scene setup:
+	- viewport 2 units tall
+	- focal length: 1 unit
+	- right-handed coordinates, camera looking -z direction `
+
 data := map(range(0, Width * Height, 1), i => (
 	x := i % Width
-	y := floor(i / Height)
+	y := floor(i / Width)
 
 	` progress indicator for every row `
 	x :: {
@@ -36,11 +61,23 @@ data := map(range(0, Width * Height, 1), i => (
 		)
 	}
 
-	[
-		255 * x / (Width - 1)
-		255 * y / (Height - 1)
-		64
-	]
+	u := x / (Width - 1)
+	v := y / (Height - 1)
+	uu := (vec3.multiply)(Horizontal, u)
+	vv := (vec3.multiply)(Vertical, v)
+
+	r := (ray.create)(
+		Origin
+		(vec3.sub)(
+			(vec3.add)(
+				LowerLeft
+				(vec3.add)(uu, vv)
+			)
+			Origin
+		)
+	)
+
+	(ray.color)(r)
 ))
 
 file := bmp(Width, Height, data)

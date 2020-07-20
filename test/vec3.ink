@@ -24,12 +24,18 @@ mark('creation, getter, setter')
 	test('can access z', v.z, 30)
 )
 
-mark('abs & abssq')
+mark('abs, abssq, norm')
 (
 	v := (vec3.create)(0, 3, 4)
 
-	test('abs() returns correct length', (vec3.abs)(v), 5)
-	test('abssq() returns correct squared length', (vec3.abssq)(v), 25)
+	test('vec3.abs', (vec3.abs)(v), 5)
+	test('vec3.abssq', (vec3.abssq)(v), 25)
+	test('vec3.norm', (vec3.abssq)((vec3.sub)(
+		(vec3.norm)(v), (vec3.create)(0, 3 / 5, 4 / 5)
+	)) < 0.000001, true)
+	test('vec3.norm of negative', (vec3.abssq)((vec3.sub)(
+		(vec3.norm)((vec3.neg)(v)), (vec3.create)(0, ~3 / 5, ~4 / 5)
+	)) < 0.000001, true)
 )
 
 mark('vec3 arithmetic')
@@ -57,6 +63,14 @@ mark('vec3.dot/cross')
 	test('vec3.dot', (vec3.dot)(a, b), 32)
 	test('vec3.cross'
 		veq((vec3.cross)(a, b), (vec3.create)(~3, 6, ~3)), true)
+)
+
+mark('vec3 to other types')
+(
+	v := (vec3.create)(~2, 2.5, 3)
+
+	test('vec3.list', (vec3.list)(v), [~2, 2.5, 3])
+	test('vec3.string', (vec3.string)(v), '[-2, 2.50000000, 3]')
 )
 
 ` print out test suite results `
