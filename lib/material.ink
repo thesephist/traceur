@@ -56,6 +56,12 @@ Metal := (color, fuzz) => {
 ` perfectly reflective Metal `
 Mirror := color => Metal(color, 0)
 
+schlick := (cosine, ri) => (
+	r0 := (1 - ri) / (1 + ri)
+	r0 := r0 * r0
+	r0 + (1 - r0) * pow((1 - cosine), 5)
+)
+
 ` ri: refractive index `
 Dielectric := ri => {
 	ri: ri
@@ -67,12 +73,40 @@ Dielectric := ri => {
 		})
 
 		unitDir := (vec3.norm)(r.dir)
-		refracted := (vec3.refract)(unitDir, rec.normal, eta)
+		cosThetaTmp := (vec3.dot)((vec3.neg)(unitDir), rec.normal)
+		cosTheta := (cosThetaTmp > 1 :: {
+			true -> 1
+			false -> cosThetaTmp
+		})
+		sinTheta := pow(1 - cosTheta * cosTheta, 0.5)
+		eta * sinTheta > 1 :: {
+			true -> (
+				reflected := (vec3.reflect)(unitDir, rec.normal)
 
-		scattered.pos := rec.point
-		scattered.dir := refracted
+				scattered.pos := rec.point
+				scattered.dir := reflected
 
-		true
+				true
+			)
+			false -> schlick(cosTheta, eta) > rand() :: {
+				true -> (
+					reflected := (vec3.reflect)(unitDir, rec.normal)
+
+					scattered.pos := rec.point
+					scattered.dir := reflected
+
+					true
+				)
+				false -> (
+					refracted := (vec3.refract)(unitDir, rec.normal, eta)
+
+					scattered.pos := rec.point
+					scattered.dir := refracted
+
+					true
+				)
+			}
+		}
 	)
 }
 

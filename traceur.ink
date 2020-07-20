@@ -62,6 +62,7 @@ Shapes := (shape.collection)([
 	(shape.sphere)(
 		(vec3.create)(0, 0, ~1)
 		0.5
+		(material.Glass)
 		(material.Lambertian)([0.5, 0.5, 0.5])
 	)
 	(shape.sphere)(
