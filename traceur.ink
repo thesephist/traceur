@@ -13,6 +13,7 @@ writeFile := std.writeFile
 
 vec3 := load('lib/vec3')
 ray := load('lib/ray')
+shape := load('lib/shape')
 
 OutputPath := './out.bmp'
 
@@ -38,14 +39,41 @@ LowerLeft := (vec3.sub)(
 	)
 )
 
-progress := {
-	time: time()
-}
-
 ` scene setup:
 	- viewport 2 units tall
 	- focal length: 1 unit
 	- right-handed coordinates, camera looking -z direction `
+
+` scene descriptions `
+
+Sphere := (shape.sphere)(
+	(vec3.create)(0, 0, ~1)
+	0.5
+)
+
+` note that in ink/bmp, rgb is reversed `
+color := ray => (
+	(Sphere.hit)(ray) :: {
+		true -> [0, 0, 255]
+		false -> (
+			unitDir := (vec3.norm)(ray.dir)
+			t := 0.5 * (unitDir.y + 1)
+			(vec3.list)(
+				(vec3.multiply)(
+					(vec3.add)(
+						(vec3.multiply)((vec3.create)(1, 1, 1), 1 - t)
+						(vec3.create)(t, 0.7 * t, 0.5 * t)
+					)
+					255
+				)
+			)
+		)
+	}
+)
+
+progress := {
+	time: time()
+}
 
 data := map(range(0, Width * Height, 1), i => (
 	x := i % Width
@@ -77,7 +105,7 @@ data := map(range(0, Width * Height, 1), i => (
 		)
 	)
 
-	(ray.color)(r)
+	color(r)
 ))
 
 file := bmp(Width, Height, data)

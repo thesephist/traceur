@@ -22,18 +22,3 @@ reverse := ray => create(
 	ray.pos
 	(vec3.neg)(ray.dir)
 )
-
-` note that in ink/bmp, rgb is reversed `
-color := ray => (
-	unitDir := (vec3.norm)(ray.dir)
-	t := 0.5 * (unitDir.y + 1)
-	(vec3.list)(
-		(vec3.multiply)(
-			(vec3.add)(
-				(vec3.multiply)((vec3.create)(1, 1, 1), 1 - t)
-				(vec3.create)(t, 0.7 * t, 0.5 * t)
-			)
-			255
-		)
-	)
-)
