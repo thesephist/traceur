@@ -14,9 +14,9 @@ Zero := create(0, 0, 0)
 
 ` square of length of a vec3 is often useful for comparisons,
 	and faster when we don't actually need an abs() `
-abssq := v => (v.x * v.x) + (v.y * v.y) + (v.z * v.z)
+abssq := v => v.x * v.x + v.y * v.y + v.z * v.z
 abs := v => pow(abssq(v), 0.5)
-neg := v => {x: ~x, y: ~y, z: ~z}
+neg := v => {x: ~1 * v.x, y: ~1 * v.y, z: ~1 * v.z}
 
 ` normalize vector against length of 1 `
 norm := v => multiply(v, 1 / abs(v))
@@ -29,7 +29,11 @@ add := (a, b) => {
 	z: a.z + b.z
 }
 
-sub := (a, b) => add(a, neg(b))
+sub := (a, b) => {
+	x: a.x - b.x
+	y: a.y - b.y
+	z: a.z - b.z
+}
 
 multiply := (v, c) => {
 	x: v.x * c
@@ -37,9 +41,11 @@ multiply := (v, c) => {
 	z: v.z * c
 }
 
-neg := v => multiply(v, ~1)
-
-divide := (v, c) => multiply(v, 1 / c)
+divide := (v, c) => {
+	x: v.x / c
+	y: v.y / c
+	z: v.z / c
+}
 
 dot := (a, b) => a.x * b.x + a.y * b.y + a.z * b.z
 

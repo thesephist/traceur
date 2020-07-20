@@ -15,13 +15,3 @@ create := (pos, dir) => {
 Zero := create(vec3.Zero, vec3.Zero)
 
 at := (ray, t) => vadd(ray.pos, vmul(ray.dir, t))
-
-fromPoints := (from, to) => create(
-	from
-	vsub(to, from)
-)
-
-reverse := ray => create(
-	ray.pos
-	vneg(ray.dir)
-)

@@ -2,7 +2,7 @@
 
 std := load('../vendor/std')
 
-each := std.each
+reduce := std.reduce
 
 vec3 := load('vec3')
 ray := load('ray')
@@ -62,8 +62,8 @@ sphere := (pos, radius, material) => {
 				t2 := (~halfB - root) / a
 
 				inRange := t => t < tMax & t > tMin
-				[inRange(t1), inRange(t2)] :: {
-					[_, true] -> (
+				inRange(t2) :: {
+					true -> (
 						rec.t := t2
 						rec.point := (ray.at)(r, t2)
 						outwardNormal := vdiv(vsub(rec.point, pos), radius)
@@ -71,15 +71,17 @@ sphere := (pos, radius, material) => {
 						rec.material := material
 						true
 					)
-					[true, _] -> (
-						rec.t := t1
-						rec.point := (ray.at)(r, t1)
-						outwardNormal := vdiv(vsub(rec.point, pos), radius)
-						(rec.setFaceNormal)(r, outwardNormal)
-						rec.material := material
-						true
-					)
-					_ -> false
+					false -> inRange(t1) :: {
+						true -> (
+							rec.t := t1
+							rec.point := (ray.at)(r, t1)
+							outwardNormal := vdiv(vsub(rec.point, pos), radius)
+							(rec.setFaceNormal)(r, outwardNormal)
+							rec.material := material
+							true
+						)
+						false -> false
+					}
 				}
 			)
 		}
@@ -94,22 +96,22 @@ collection := items => {
 			hitAnything: false
 			closestSoFar: tMax
 		}
-
-		each(items, item => (
+		r := reduce(items, (tmp, item) => (
 			(item.hit)(r, tMin, tmp.closestSoFar, tmp.rec) :: {
 				true -> (
-					tmp.hitAnything := true
 					tmp.closestSoFar := tmp.rec.t
-
-					rec.point := tmp.rec.point
-					rec.normal := tmp.rec.normal
-					rec.material := tmp.rec.material
-					rec.t := tmp.rec.t
-					rec.frontFace := tmp.rec.frontFace
+					tmp.hitAnything := true
 				)
+				false -> tmp
 			}
-		))
+		), tmp)
 
-		tmp.hitAnything
+		rec.point := r.rec.point
+		rec.normal := r.rec.normal
+		rec.material := r.rec.material
+		rec.t := r.rec.t
+		rec.frontFace := r.rec.frontFace
+
+		r.hitAnything
 	)
 }

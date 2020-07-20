@@ -30,9 +30,10 @@ OutputPath := './out.bmp'
 Width := 320
 Height := 180
 
-SamplesPerPixel := 30
-SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
+SamplesPerPixel := 30
+SamplesPerPixelRangeX := map(range(0, SamplesPerPixel, 1), rand)
+SamplesPerPixelRangeY := map(range(0, SamplesPerPixel, 1), rand)
 
 ` scene setup `
 
@@ -42,7 +43,7 @@ Camera := (camera.create)(
 	v(0, 1, 0)
 	30
 	Width / Height
-	1.2
+	0.75
 )
 
 Shapes := (shape.collection)([
@@ -73,40 +74,33 @@ Shapes := (shape.collection)([
 	)
 ])
 
+Zero := [0, 0, 0]
+
 ` note that in ink/bmp, rgb is reversed `
 color := (r, depth) => depth :: {
-	0 -> [0, 0, 0]
-	_ -> (
-		rec := shape.hitRecordZero
-
-		(Shapes.hit)(r, 0.0001, 9999999, rec) :: {
+	0 -> Zero
+	_ -> (Shapes.hit)(r, 0.0001, 9999999, rec := shape.hitRecordZero) :: {
+		true -> (rec.material.scatter)(r, rec, attenuation := [1, 1, 1], scattered := ray.Zero) :: {
 			true -> (
-				attenuation := [1, 1, 1]
-				scattered := ray.Zero
-				(rec.material.scatter)(r, rec, attenuation, scattered) :: {
-					true -> (
-						c := color(scattered, depth - 1)
-						[
-							attenuation.0 * c.0
-							attenuation.1 * c.1
-							attenuation.2 * c.2
-						]
-					)
-					false -> [0, 0, 0]
-				}
+				c := color(scattered, depth - 1)
+				[
+					attenuation.0 * c.0
+					attenuation.1 * c.1
+					attenuation.2 * c.2
+				]
 			)
-			false -> (
-				unitDir := vnorm(r.dir)
-				t := 0.5 * (unitDir.y + 1)
-				vlist(
-					vadd(
-						vmul(v(1, 1, 1), 1 - t)
-						v(t, 0.7 * t, 0.5 * t)
-					)
+			false -> Zero
+		}
+		false -> (
+			t := 0.5 * (vnorm(r.dir).y + 1)
+			vlist(
+				vadd(
+					vmul(v(1, 1, 1), 1 - t)
+					v(t, 0.7 * t, 0.5 * t)
 				)
 			)
-		}
-	)
+		)
+	}
 }
 
 progress := {
@@ -127,12 +121,15 @@ data := map(range(0, Width * Height, 1), i => (
 		)
 	}
 
-	sum := reduce(SamplesPerPixelRange, acc => (
-		u := (x + rand()) / (Width - 1)
-		v := (y + rand()) / (Height - 1)
-		r := (Camera.getRay)(u, v)
-
-		c := color(r, MaxDepth)
+	getRay := Camera.getRay
+	sum := reduce(SamplesPerPixelRangeX, (acc, xr, i) => (
+		c := color(
+			getRay(
+				(x + xr) / (Width - 1)
+				(y + SamplesPerPixelRangeY.(i)) / (Height - 1)
+			)
+			MaxDepth
+		)
 		acc.0 := acc.0 + c.0
 		acc.1 := acc.1 + c.1
 		acc.2 := acc.2 + c.2
