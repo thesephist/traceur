@@ -6,14 +6,18 @@ Traceur is an experimental pathtracing 3D renderer written in [Ink](https://gith
 
 ## Design
 
-## Progress
+## Resources and further reading
 
-Resources I'm using:
-
+- Ray Tracing in One Weekend: [https://raytracing.github.io/](https://raytracing.github.io/)
 - Kevin Beason's mini pathtracer projects:
     - smallpt: [https://www.kevinbeason.com/smallpt/](https://www.kevinbeason.com/smallpt/)
     - livecoding stream: [https://www.youtube.com/watch?v=PGuxfdyaKJU](https://www.youtube.com/watch?v=PGuxfdyaKJU)
-- _The Ray Tracer Challenge_): [https://www.amazon.com/Ray-Tracer-Challenge-Test-Driven-Renderer/dp/1680502719](https://www.amazon.com/Ray-Tracer-Challenge-Test-Driven-Renderer/dp/1680502719)
+- _The Ray Tracer Challenge_: [https://www.amazon.com/Ray-Tracer-Challenge-Test-Driven-Renderer/dp/1680502719](https://www.amazon.com/Ray-Tracer-Challenge-Test-Driven-Renderer/dp/1680502719)
 - Haskell Ray Tracer: [https://wiki.haskell.org/The_Monad.Reader/Issue5/HRay:_A_Haskell_ray_tracer](https://wiki.haskell.org/The_Monad.Reader/Issue5/HRay:_A_Haskell_ray_tracer)
 
 ## Usage
+
+Make sure you have Ink installed on your system.
+
+- `./test.ink` to run all unit tests
+- `./traceur.ink` to run the pathtracer. The output file defaults to `./out.bmp`
