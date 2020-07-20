@@ -4,24 +4,34 @@ util := load('util')
 vec3 := load('vec3')
 ray := load('ray')
 
-create := (fov, aspect) => (
+vnorm := vec3.norm
+vadd := vec3.add
+vsub := vec3.sub
+vmul := vec3.multiply
+vdiv := vec3.divide
+vcross := vec3.cross
+
+create := (lookfrom, lookat, vup, fov, aspect) => (
 	theta := (util.degreeToRadian)(fov)
 	h := sin(theta / 2) / cos(theta / 2)
 
 	viewportHeight := 2 * h
 	viewportWidth := viewportHeight * aspect
-	focalLength := 1
 
-	origin := (vec3.create)(0, 0, 0)
-	horizontal := (vec3.create)(viewportWidth, 0, 0)
-	vertical := (vec3.create)(0, viewportHeight, 0)
-	lowerLeft := (vec3.sub)(
+	w := vnorm(vsub(lookfrom, lookat))
+	u := vnorm(vcross(vup, w))
+	v := vcross(w, u)
+
+	origin := lookfrom
+	horizontal := vmul(u, viewportWidth)
+	vertical := vmul(v, viewportHeight)
+	lowerLeft := vsub(
 		origin
-		(vec3.add)(
-			(vec3.add)(
-				(vec3.divide)(horizontal, 2), (vec3.divide)(vertical, 2)
+		vadd(
+			vadd(
+				vdiv(horizontal, 2), vdiv(vertical, 2)
 			)
-			(vec3.create)(0, 0, focalLength)
+			w
 		)
 	)
 
@@ -32,12 +42,12 @@ create := (fov, aspect) => (
 		vertical: vertical
 		getRay: (u, v) => (ray.create)(
 			origin
-			(vec3.sub)(
-				(vec3.add)(
+			vsub(
+				vadd(
 					lowerLeft
-					(vec3.add)(
-						(vec3.multiply)(horizontal, u)
-						(vec3.multiply)(vertical, v)
+					vadd(
+						vmul(horizontal, u)
+						vmul(vertical, v)
 					)
 				)
 				origin

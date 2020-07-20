@@ -20,21 +20,26 @@ material := load('lib/material')
 
 OutputPath := './out.bmp'
 
-Width := 160
-Height := 90
-aspect := Width / Height
+Width := 320
+Height := 180
 
-SamplesPerPixel := 8
+SamplesPerPixel := 40
 SamplesPerPixelRange := range(0, SamplesPerPixel, 1)
 MaxDepth := 50
 
 ` scene setup `
 
-Camera := (camera.create)(90, aspect)
+Camera := (camera.create)(
+	v(~2, 2, 1)
+	v(0, 0, ~1)
+	v(0, 1, 0)
+	20
+	Width / Height
+)
 
 Shapes := (shape.collection)([
 	(shape.sphere)(
-		(vec3.create)(0, 0, ~1)
+		v(0, 0, ~1)
 		0.5
 		(material.Lambertian)([0.6, 0.5, 0.3])
 	)
