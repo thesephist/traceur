@@ -16,10 +16,8 @@ vrUV := vec3.randUnitVec
 Matte := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
-		scatterDir := vadd(rec.normal, vrUS())
-
 		scattered.pos := rec.point
-		scattered.dir := scatterDir
+		scattered.dir := vadd(rec.normal, vrUS())
 
 		attenuation.0 := color.0
 		attenuation.1 := color.1
@@ -31,10 +29,8 @@ Matte := (color) => {
 Lambertian := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
-		scatterDir := vadd(rec.normal, vrUV())
-
 		scattered.pos := rec.point
-		scattered.dir := scatterDir
+		scattered.dir := vadd(rec.normal, vrUV())
 
 		attenuation.0 := color.0
 		attenuation.1 := color.1
