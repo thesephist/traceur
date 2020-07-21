@@ -29,8 +29,8 @@ sphere := shape.sphere
 
 OutputPath := './out.bmp'
 
-Width := 600
-Height := 400
+Width := 720
+Height := 480
 MaxDepth := 50
 SamplesPerPixel := 16
 SamplesPerPixelRangeX := map(range(0, SamplesPerPixel, 1), rand)
@@ -38,40 +38,25 @@ SamplesPerPixelRangeX := map(range(0, SamplesPerPixel, 1), rand)
 ` scene setup `
 
 Camera := (camera.create)(
-	v(~3, 3, 2)
-	v(0, 0, ~1)
+	v(~7, 2, 2)
+	v(0, 0, ~1.8)
 	v(0, 1, 0)
-	20
+	15
 	Width / Height
-	0.25
+	0.16
 )
 
+` started 5:24 `
+
 Shapes := (shape.collection)([
-	sphere(
-		v(0, 0, ~1)
-		0.5
-		(material.Lambertian)([0.6, 0.5, 0.3])
-	)
-	sphere(
-		v(0, ~100.5, ~1)
-		100
-		(material.Mirror)([0.85, 0.85, 1])
-	)
-	sphere(
-		v(~1, 0, ~1)
-		0.5
-		material.Glass
-	)
-	sphere(
-		v(~1, 0, ~1)
-		~0.4
-		material.Glass
-	)
-	sphere(
-		v(1, 0, ~1)
-		0.5
-		(material.Metal)([0.2, 0.6, 0.8], 0.12)
-	)
+	` backdrop `
+	sphere(v(0, ~100.5, ~1), 100, (material.Metal)([0.65, 0.75, 0.75], 0.2))
+	sphere(v(0, 0, ~101.8), 100, (material.Mirror)([0.99, 0.99, 0.99]))
+	` objects `
+	sphere(v(~1, 0, ~1), 0.5, material.Glass)
+	sphere(v(~1, 0, ~1), ~0.36, material.Glass)
+	sphere(v(0, ~0.14, ~1), 0.36, (material.Lambertian)([0.65, 0.714, 0.067]))
+	sphere(v(1, 0.14, ~1), 0.64, (material.Metal)([0.5, 0.6, 0.9], 0.12))
 ])
 
 Black := [0, 0, 0]
