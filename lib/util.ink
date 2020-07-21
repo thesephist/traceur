@@ -13,3 +13,8 @@ clamp := (x, min, max) => x < min :: {
 		_ -> x
 	}
 }
+
+doubleDigit := n => n > 9 :: {
+	true -> string(n)
+	false -> '0' + string(n)
+}

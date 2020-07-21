@@ -12,12 +12,14 @@ map := std.map
 reduce := std.reduce
 writeFile := std.writeFile
 
+util := load('lib/util')
 vec3 := load('lib/vec3')
 ray := load('lib/ray')
 shape := load('lib/shape')
 camera := load('lib/camera')
 material := load('lib/material')
 
+doubleDigit := util.doubleDigit
 v := vec3.create
 vnorm := vec3.norm
 vadd := vec3.add
@@ -41,9 +43,9 @@ Camera := (camera.create)(
 	v(~3, 3, 2)
 	v(0, 0, ~1)
 	v(0, 1, 0)
-	30
+	25
 	Width / Height
-	0.75
+	0.5
 )
 
 Shapes := (shape.collection)([
@@ -104,7 +106,8 @@ color := (r, depth) => depth :: {
 }
 
 progress := {
-	time: time()
+	pxWritten: 0
+	startTime: time()
 }
 
 data := map(range(0, Width * Height, 1), i => (
@@ -114,10 +117,20 @@ data := map(range(0, Width * Height, 1), i => (
 	` progress indicator for every row `
 	x :: {
 		0 -> (
-			t := time()
-			elapsed := t - progress.time
-			progress.time := t
-			log(f('Rendering row {{0}} -> {{1}}px/sec', [y, floor(Width / elapsed)]))
+			progress.pxWritten := progress.pxWritten + Width
+			elapsed := time() - progress.startTime
+			remainingPx := Width * Height - i
+			speed := progress.pxWritten / elapsed
+			remainingSecs := remainingPx / speed
+			log(f(
+				'Rendering row {{0}} -> {{1}}px/sec. {{2}}:{{3}} remaining.'
+				[
+					y
+					floor(speed)
+					floor(remainingSecs / 60)
+					doubleDigit(floor(remainingSecs % 60))
+				]
+			))
 		)
 	}
 
