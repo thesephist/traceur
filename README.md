@@ -4,7 +4,7 @@ Traceur (pronounced like _trace_ + _connoisseur_) is an experimental path tracin
 
 ![Header image render](img/main.bmp)
 
-There is also a direct and well-optimized Web and JavaScript port of Traceur at [thesephist/traceur-web](https://github.com/thesephist/traceur-web). If you want a taste of how path tracing in traceur works, you can try an interactive demo at [traceur-web.thesephist.repl.co](https://traceur-web.thesephist.repl.co/).
+There is also a direct and well-optimized Web and JavaScript port of Traceur at [thesephist/traceur-web](https://github.com/thesephist/traceur-web). If you want a taste of how path tracing in Traceur works, you can try an interactive demo at [traceur-web.thesephist.repl.co](https://traceur-web.thesephist.repl.co/).
 
 ## Motivation
 
@@ -17,11 +17,9 @@ Traceur has two goals.
 
 ## Design and progress
 
-// just explain each lib and how the main rendering loop works.
-
 Traceur is a straightforward path tracer that follows rays cast (with some pseudorandom noise) from the camera lens through each pixel in the viewport. It finds intersections and hit points on spheres, the only shape currently supported, analytically. Following the path tracing guide above, Traceur currently supports:
 
-- Spheres and "planes" with large spheres
+- Spheres and "planes" approximated with large spheres
 - Background lighting, soft shadows
 - Refractive and reflective surfaces
 - Arbitrary object and camera positions with full 6DOF
@@ -57,7 +55,7 @@ Make sure you have Ink installed on your system, and `inkfmt` installed for `mak
 
 ## Sample renders
 
-Full glass orb with no focus blur
+Full glass orb with no focus blur on the scene
 
 ![Full glass orb with no focus blur](img/no-blur.bmp)
 
@@ -65,7 +63,7 @@ Lambertian material as the floor
 
 ![Lambertian floor sample](img/lambert-floor.bmp)
 
-More samples (top), Fewer samples (bottom)
+More samples (top), Fewer samples (bottom) on the same scene
 
 ![More samples](img/more-samples.bmp)
 
