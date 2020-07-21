@@ -29,13 +29,11 @@ sphere := shape.sphere
 
 OutputPath := './out.bmp'
 
-Width := 320
-Height := 180
-
+Width := 600
+Height := 400
 MaxDepth := 50
-SamplesPerPixel := 30
+SamplesPerPixel := 16
 SamplesPerPixelRangeX := map(range(0, SamplesPerPixel, 1), rand)
-SamplesPerPixelRangeY := map(range(0, SamplesPerPixel, 1), rand)
 
 ` scene setup `
 
@@ -43,9 +41,9 @@ Camera := (camera.create)(
 	v(~3, 3, 2)
 	v(0, 0, ~1)
 	v(0, 1, 0)
-	25
+	20
 	Width / Height
-	0.5
+	0.25
 )
 
 Shapes := (shape.collection)([
@@ -57,7 +55,7 @@ Shapes := (shape.collection)([
 	sphere(
 		v(0, ~100.5, ~1)
 		100
-		(material.Lambertian)([0.5, 0.5, 0.5])
+		(material.Mirror)([0.85, 0.85, 1])
 	)
 	sphere(
 		v(~1, 0, ~1)
@@ -135,11 +133,13 @@ data := map(range(0, Width * Height, 1), i => (
 	}
 
 	getRay := Camera.getRay
-	sum := reduce(SamplesPerPixelRangeX, (acc, xr, i) => (
+	sum := reduce(SamplesPerPixelRangeX, (acc, xr) => (
 		c := color(
 			getRay(
 				(x + xr) / (Width - 1)
-				(y + SamplesPerPixelRangeY.(i)) / (Height - 1)
+				` direct rand() call here is faster than fetching
+					a globally cached random value from a list `
+				(y + rand()) / (Height - 1)
 			)
 			MaxDepth
 		)

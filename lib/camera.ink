@@ -45,9 +45,9 @@ create := (lookfrom, lookat, vup, fov, aspect, aperture) => (
 	{
 		getRay: (s, t) => (
 			rd := vmul(vrUD(), lensRadius)
-			offset := vadd(vmul(u, rd.x), vmul(v, rd.y))
+			originAndOffset := vadd(origin, vadd(vmul(u, rd.x), vmul(v, rd.y)))
 			rcr(
-				vadd(origin, offset)
+				originAndOffset
 				vsub(
 					vadd(
 						lowerLeft
@@ -56,7 +56,7 @@ create := (lookfrom, lookat, vup, fov, aspect, aperture) => (
 							vmul(vertical, t)
 						)
 					)
-					vadd(origin, offset)
+					originAndOffset
 				)
 			)
 		)
