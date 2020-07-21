@@ -75,7 +75,7 @@ Mirror := color => Metal(color, 0)
 schlick := (cosine, ri) => (
 	r0 := (1 - ri) / (1 + ri)
 	r0 := r0 * r0
-	r0 + (1 - r0) * pow((1 - cosine), 5)
+	r0 + (1 - r0) * pow(1 - cosine, 5)
 )
 
 ` Dielectric material represents a refractive
@@ -84,7 +84,9 @@ schlick := (cosine, ri) => (
 Dielectric := ri => {
 	ri: ri
 	scatter: (r, rec, attenuation, scattered) => (
-		attenuation := [1, 1, 1]
+		attenuation.0 = 1
+		attenuation.1 = 1
+		attenuation.2 = 1
 		eta := (rec.frontFace :: {
 			true -> 1 / ri
 			false -> ri
@@ -139,4 +141,4 @@ Diamond := Dielectric(2.417)
 
 ` Zero material is a grey Lambertian material and the
 	default material for shapes `
-Zero := Lambertian([0, 0, 0], 0.5)
+Zero := Lambertian([0.5, 0.5, 0.5], 0.5)
