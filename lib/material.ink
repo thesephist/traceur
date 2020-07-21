@@ -13,6 +13,10 @@ vrefr := vec3.refract
 vrUS := vec3.randUnitSphere
 vrUV := vec3.randUnitVec
 
+` Matte material approximates a true Lambertian surface
+	by randomly picking a reflection direction from
+	points uniformly distributed inside a unit sphere
+	tangent to the hit point. `
 Matte := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
@@ -26,6 +30,8 @@ Matte := (color) => {
 	)
 }
 
+` Lambertian material is a diffusive surface
+	that biases towards reflecting toward the surface normal `
 Lambertian := (color) => {
 	color: color
 	scatter: (r, rec, attenuation, scattered) => (
@@ -39,6 +45,8 @@ Lambertian := (color) => {
 	)
 }
 
+` Metal material reflects rays such that the incidence
+	and reflection angles are the same, within a small fuzz margin `
 Metal := (color, fuzz) => {
 	color: color
 	fuzz: fuzz
@@ -59,16 +67,20 @@ Metal := (color, fuzz) => {
 	)
 }
 
-` perfectly reflective Metal `
+` Mirror material is a perfectly reflective Metal `
 Mirror := color => Metal(color, 0)
 
+` Schlick formula for total internal reflection
+	used in Dielectric material `
 schlick := (cosine, ri) => (
 	r0 := (1 - ri) / (1 + ri)
 	r0 := r0 * r0
 	r0 + (1 - r0) * pow((1 - cosine), 5)
 )
 
-` ri: refractive index `
+` Dielectric material represents a refractive
+	material like water or glass following Snell's rule.
+	ri is the refractive index `
 Dielectric := ri => {
 	ri: ri
 	scatter: (r, rec, attenuation, scattered) => (
@@ -116,10 +128,15 @@ Dielectric := ri => {
 	)
 }
 
+` Glass is a dielectric material with ri approximating real glass `
 Glass := Dielectric(1.517)
 
+` Water is a dielectric material with ri approximating real water `
 Water := Dielectric(1.333)
 
+` Diamond is a dielectric material with ri approximating real diamond `
 Diamond := Dielectric(2.417)
 
+` Zero material is a grey Lambertian material and the
+	default material for shapes `
 Zero := Lambertian([0, 0, 0], 0.5)

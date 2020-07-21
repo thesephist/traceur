@@ -14,4 +14,5 @@ create := (pos, dir) => {
 
 Zero := create(vec3.Zero, vec3.Zero)
 
+` march ray to time t `
 at := (ray, t) => vadd(ray.pos, vmul(ray.dir, t))

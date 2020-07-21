@@ -1,4 +1,4 @@
-` library of basic shapes `
+` library of basic shapes and hit testing algorithms `
 
 std := load('../vendor/std')
 
@@ -14,7 +14,8 @@ vdiv := vec3.divide
 vabssq := vec3.abssq
 vdot := vec3.dot
 
-` hit record `
+` hit record encapsulates data that hit and scattering algorithms
+	use to recursively march a ray `
 hitRecord := (point, normal, material, t, frontFace) => self := {
 	point: point
 	normal: normal

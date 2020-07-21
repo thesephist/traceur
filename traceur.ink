@@ -1,6 +1,6 @@
 #!/usr/bin/env ink
 
-` traceur: a basic path tracer `
+` traceur: a path tracer `
 
 std := load('vendor/std')
 bmp := load('vendor/bmp').bmp
@@ -74,11 +74,13 @@ Shapes := (shape.collection)([
 	)
 ])
 
-Zero := [0, 0, 0]
+Black := [0, 0, 0]
 
-` note that in ink/bmp, rgb is reversed `
+` main function to recursively raymarch until we determine a color
+	for the ray or reach max recursion depth.
+	note that in ink/bmp, rgb is reversed (bgr) `
 color := (r, depth) => depth :: {
-	0 -> Zero
+	0 -> Black
 	_ -> (Shapes.hit)(r, 0.0001, 9999999, rec := shape.hitRecordZero) :: {
 		true -> (rec.material.scatter)(r, rec, attenuation := [1, 1, 1], scattered := ray.Zero) :: {
 			true -> (
@@ -89,7 +91,7 @@ color := (r, depth) => depth :: {
 					attenuation.2 * c.2
 				]
 			)
-			false -> Zero
+			false -> Black
 		}
 		false -> (
 			t := 0.5 * (vnorm(r.dir).y + 1)
@@ -108,6 +110,7 @@ progress := {
 	startTime: time()
 }
 
+` render the scene by pathtracing from each pixel iteratively `
 data := map(range(0, Width * Height, 1), i => (
 	x := i % Width
 	y := floor(i / Width)
@@ -155,8 +158,10 @@ data := map(range(0, Width * Height, 1), i => (
 	]
 ))
 
+` create the binary bitmap file `
 file := bmp(Width, Height, data)
 
+` save / write the file to disk `
 writeFile(OutputPath, file, r => r :: {
 	() -> log('File write failed')
 	_ -> log('File saved to ' + OutputPath)

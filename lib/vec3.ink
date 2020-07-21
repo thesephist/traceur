@@ -59,8 +59,6 @@ list := v => [v.x, v.y, v.z]
 
 string := v => f('[{{x}}, {{y}}, {{z}}]', v)
 
-rand := () => create(rand(), rand(), rand())
-
 randRange := (min, max) => create(
 	urR(min, max)
 	urR(min, max)
