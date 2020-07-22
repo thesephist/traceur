@@ -1,6 +1,6 @@
 # traceur 🔭
 
-Traceur (pronounced like _trace_ + _connoisseur_) is an experimental path tracing 3D renderer written in [Ink](https://github.com/thesephist/ink), a dynamically-typed, functional programming language I created.
+Traceur (pronounced like _trace_ + _connoisseur_) is an experimental path tracing 3D renderer written in [Ink](https://github.com/thesephist/ink), a dynamically-typed, functional programming language I created. You can read more about Traceur in my [blog post about it](https://dotink.co/posts/traceur/) on the Ink language blog.
 
 ![Header image render](img/main.bmp)
 
